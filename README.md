@@ -1,5 +1,5 @@
 # jenkins-provisioner
-Jenkins server provisioner for systems where docker isn't a option
+Jenkins server provisioner for systems where docker isn't a option due to lack of sudo/root permission.
 
 
 ### Features
