@@ -16,3 +16,10 @@ Jenkins server provisioner for systems where docker isn't a option due to lack o
 - [ ] backup
 - [ ] Update Nginx redirect
 - [ ] proper log handling
+
+
+### Usage
+
+#### Deploying new master server
+
+[![asciicast](https://asciinema.org/a/KddRIgnQA4u9jc2PJGqAwoGfT.svg)](https://asciinema.org/a/KddRIgnQA4u9jc2PJGqAwoGfT)
