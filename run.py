@@ -9,47 +9,74 @@ import os
 import sys
 import socket
 import argparse
-import signal
 import requests
 import subprocess
 from pathlib import Path
+from configparser import ConfigParser
+
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class Utilities(object):
 
     @staticmethod
     def jenkins_war_path():
-        return os.path.join('bin', 'jenkins.war')
+        bin = Utilities.get('path', 'bin')
+        war_file = Utilities.get('jenkins', 'war_file')
+        return os.path.join(base_dir, bin, war_file)
 
     @staticmethod
     def download_jenkins():
-
+        print(Utilities.jenkins_war_path())
         if os.path.exists(Utilities.jenkins_war_path()):
             pass
         else:
             print('Downloading Jenkins war file, please wait...')
-            os.mkdir('bin')
             filename = Path(Utilities.jenkins_war_path())
-            url = 'http://mirrors.jenkins.io/war-stable/latest/jenkins.war'
+            url = Utilities.get('jenkins', 'war_url')
             r = requests.get(url)
             filename.write_bytes(r.content)
 
-            print('Download finished.')
-
     @staticmethod
     def port_check():
-        addr = '127.0.0.1'
-        port = 8080
-
+        ipaddr = Utilities.get('server', 'ipaddr')
+        port = Utilities.get('server', 'base_port')
+        port = int(port)
         while True:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 try:
-                    result = s.connect((addr, port))
+                    result = s.connect((ipaddr, port))
                     if result == 0:
                         print(f'port {port} is open')
-                    port = port +1
+                    port = port + 1
+
                 except:
                     return port
+
+    @staticmethod
+    def get(section, key):
+        config_file = 'config.ini'
+        config_file_path = os.path.join(base_dir, config_file)
+
+        if os.path.exists(config_file_path):
+            try:
+                config = ConfigParser()
+                config.read(config_file_path)
+                return config.get(section, key)
+            except KeyError:
+                print(f'Section: {section} or Key: {key} not found.')
+                sys.exit(1)
+        else:
+            print('Error : Configuration file not found')
+            print(f'Please check if {base_dir}/{config_file} exsits')
+            sys.exit(1)
+
+    @staticmethod
+    def create_dir(dirname):
+        full_path = os.path.join(base_dir, dirname)
+        if not os.path.exists(full_path):
+            os.makedirs(full_path)
 
 
 class JenkinsManager(object):
@@ -58,12 +85,16 @@ class JenkinsManager(object):
         self.name = name
 
     def setup(self):
-        os.makedirs(self.instance_path())
-        os.mkdir('run')
-        os.mkdir('logs')
+        log_dir = Utilities.get('path', 'logdir')
+        bin_dir = Utilities.get('path', 'pid_store')
+        instance = self.instance_path()
+
+        for i in [log_dir, bin_dir, instance]:
+            Utilities.create_dir(i)
 
     def instance_path(self):
-        return os.path.join('instances', self.name)
+        base = Utilities.get('path', 'instances')
+        return os.path.join(base, self.name)
 
     def deploy(self):
         if os.path.exists(self.instance_path()):
@@ -74,7 +105,7 @@ class JenkinsManager(object):
             self.setup()
             Utilities.download_jenkins()
 
-        self.launch_and_watch()
+        self.start_jenkins()
         sys.exit(0)
 
     def remove(self):
@@ -84,17 +115,20 @@ class JenkinsManager(object):
         pass
 
     def stop(self):
-        pid_file = os.path.join(os.getcwd(), 'run', f'{self.name}.pid')
+        pid_path = os.path.join(Utilities.get('path', 'run'))
+        pid_file = f'{self.name}.pid'
+        pid_file = os.path.join(os.getcwd(), pid_path, pid_file)
         c = int(Path(pid_file).read_text())
-        print(os.getp(c))
+        print(os.getppid(c))
 
-    def launch_and_watch(self):
+    def start_jenkins(self):
         port = Utilities.port_check()
 
         subprocess.Popen(
             'wrapper.sh', env=dict(
                 **{
                     'PIDFILE': os.path.join(os.getcwd(), 'run', f'{self.name}.pid'),
+                    'NAME': self.name,
                     'JENKINS_HOME': self.instance_path(),
                     'LOGFILE': os.path.join(os.getcwd(), 'logs', f'{self.name}.log'),
                     'PORT': f'{port}'
