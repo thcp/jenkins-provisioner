@@ -23,3 +23,5 @@ Jenkins server provisioner for systems where docker isn't a option due to lack o
 #### Deploying new master server
 
 [![asciicast](https://asciinema.org/a/YNBcLat3XN7Ax5rU649z73LMg.svg)](https://asciinema.org/a/YNBcLat3XN7Ax5rU649z73LMg)
+
+*( typo on stop option corrected, this rec will be updated when possible )*
