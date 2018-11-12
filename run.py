@@ -22,13 +22,13 @@ class Utilities(object):
 
     @staticmethod
     def jenkins_war_path():
+        base_dir = Utilities.get('path', 'base')
         bin = Utilities.get('path', 'bin')
         war_file = Utilities.get('jenkins', 'war_file')
         return os.path.join(base_dir, bin, war_file)
 
     @staticmethod
     def download_jenkins():
-        print(Utilities.jenkins_war_path())
         if os.path.exists(Utilities.jenkins_war_path()):
             pass
         else:
@@ -85,16 +85,28 @@ class JenkinsManager(object):
         self.name = name
 
     def setup(self):
-        log_dir = Utilities.get('path', 'logdir')
-        bin_dir = Utilities.get('path', 'pid_store')
-        instance = self.instance_path()
-
-        for i in [log_dir, bin_dir, instance]:
+        for i in [self.log_path(), self.bin_path(), self.pid_path(), self.instance_path()]:
             Utilities.create_dir(i)
 
+    def log_path(self):
+        base_dir = Utilities.get('path', 'base')
+        log_dir = Utilities.get('path', 'logdir')
+        return os.path.join(base_dir, log_dir)
+
+    def bin_path(self):
+        base_dir = Utilities.get('path', 'base')
+        bin_dir = Utilities.get('path', 'bin')
+        return os.path.join(base_dir, bin_dir)
+
+    def pid_path(self):
+        base_dir = Utilities.get('path', 'base')
+        pid_dir = Utilities.get('path', 'pid_store')
+        return os.path.join(base_dir, pid_dir)
+
     def instance_path(self):
-        base = Utilities.get('path', 'instances')
-        return os.path.join(base, self.name)
+        base = Utilities.get('path', 'base')
+        instances = Utilities.get('path', 'instances')
+        return os.path.join(base, instances, self.name)
 
     def deploy(self):
         if os.path.exists(self.instance_path()):
@@ -125,11 +137,11 @@ class JenkinsManager(object):
         delay = Utilities.get('internal', 'delay')
         subprocess.Popen(
             'wrapper.sh', env=dict(
-                **{
-                    'PIDFILE': os.path.join(os.getcwd(), 'run', f'{self.name}.pid'),
+                **{'JENKINS_WAR_FILE': Utilities.jenkins_war_path() ,
+                    'PIDFILE': os.path.join(self.log_path(), f'{self.name}.pid'),
                     'NAME': self.name,
                     'JENKINS_HOME': self.instance_path(),
-                    'LOGFILE': os.path.join(os.getcwd(), 'logs', f'{self.name}.log'),
+                    'LOGFILE': os.path.join(self.log_path(), self.name),
                     'PORT': f'{port}',
                     'DELAY': f'{delay}'
                 }
