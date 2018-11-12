@@ -154,7 +154,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--instance', help='Instance name', required=True)
     parser.add_argument('-d', '--deploy', help='Deploy new Jenkins instace', action='store_true')
     parser.add_argument('-R', '--remove', help='Remove existing Jenkins instance', action='store_true')
-    parser.add_argument('-S', '--stop', help='Remove existing Jenkins instance', action='store_true')
+    parser.add_argument('-S', '--stop', help='Stop Jenkins instance', action='store_true')
     parser.add_argument('-s', '--status', help='Jenkins status', action='store_true')
     args = parser.parse_args()
 
