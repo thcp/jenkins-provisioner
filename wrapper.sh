@@ -11,14 +11,13 @@ start_jenkins() {
     echo $! > "$PIDFILE"
 }
 
-start_jenkins
-#while :
-#do
-#    if [[ ! -f "/proc/$(cat $PIDFILE)/status" ]]
-#    then
-#        start_jenkins
-#    else
-#        :
-#    fi
-#    sleep 10
-#done
+while :
+do
+    if [[ ! -f "/proc/$(cat $PIDFILE)/status" ]]
+    then
+        start_jenkins
+    else
+        :
+    fi
+    sleep "${DELAY}"
+done
