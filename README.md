@@ -7,6 +7,9 @@ Jenkins server provisioner for systems where docker isn't a option due to lack o
 - Auto provision new master node by testing next available port.
 - really basic self restart process for each instance.
 
-
-### Future improvements
-todo
+### Todo
+- [x] Deploy
+- [ ] Remove 
+- [ ] stop
+- [ ] start
+- [ ] restart
