@@ -1,7 +1,6 @@
 # jenkins-provisioner
 Jenkins server provisioner for systems where docker isn't a option due to lack of sudo/root permission.
 
-
 ### Features
 
 - Auto provision new master node by testing next available port.
@@ -13,3 +12,7 @@ Jenkins server provisioner for systems where docker isn't a option due to lack o
 - [ ] stop
 - [ ] start
 - [ ] restart
+- [ ] status
+- [ ] backup
+- [ ] Update Nginx redirect
+- [ ] proper log handling
