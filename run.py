@@ -115,15 +115,14 @@ class JenkinsManager(object):
         pass
 
     def stop(self):
-        pid_path = os.path.join(Utilities.get('path', 'run'))
-        pid_file = f'{self.name}.pid'
-        pid_file = os.path.join(os.getcwd(), pid_path, pid_file)
-        c = int(Path(pid_file).read_text())
-        print(os.getppid(c))
+        pass
+
+    def backup(self):
+        pass
 
     def start_jenkins(self):
         port = Utilities.port_check()
-
+        delay = Utilities.get('internal', 'delay')
         subprocess.Popen(
             'wrapper.sh', env=dict(
                 **{
@@ -131,7 +130,8 @@ class JenkinsManager(object):
                     'NAME': self.name,
                     'JENKINS_HOME': self.instance_path(),
                     'LOGFILE': os.path.join(os.getcwd(), 'logs', f'{self.name}.log'),
-                    'PORT': f'{port}'
+                    'PORT': f'{port}',
+                    'DELAY': f'{delay}'
                 }
             )
         )
