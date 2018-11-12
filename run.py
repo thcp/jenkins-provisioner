@@ -116,9 +116,8 @@ class JenkinsManager(object):
             print(f'Deploying New jenkins master Server: {self.name}')
             self.setup()
             Utilities.download_jenkins()
-
-        self.start_jenkins()
-        sys.exit(0)
+            self.start_jenkins()
+            sys.exit(0)
 
     def remove(self):
         pass
